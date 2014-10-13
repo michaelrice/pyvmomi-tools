@@ -47,12 +47,41 @@ hard_reboot
 
 A blocking call to the ResetVM_Task method. Relies on the task extensions.
 
+clone
+-----
+
+code::
+    vm.clone(xxx, yyy)
+
+A CloneVM_Task is created. Depending on options it may or may not wait for
+that task to complete, and will return either a VirtualMachine or a Task.
+
 """
-__author__ = "VMware, Inc."
+__author__ = ["VMware, Inc.", "Michael Rice"]
 
 from pyVmomi import vim
+
+
+def clone(name, *args, **kwargs):
+    """
+    This method needs to support the pysphere clone options so it can be used
+    in projects like SaltCloud where they originally used pysphere.
+
+    name, sync_run=True, folder=None, resourcepool=None, datastore=None,
+    host=None, power_on=True, template=False, snapshot=None, linked=False
+
+    :param name:
+    :param args:
+    :param kwargs:
+    :return:
+    """
+    sync_run = True
+    if "sync_run" in kwargs:
+        sync_run = kwargs.get("sync_run")
+    pass
 
 vim.VirtualMachine.power_on = lambda self: self.PowerOn().wait()
 vim.VirtualMachine.power_off = lambda self: self.PowerOff().wait()
 vim.VirtualMachine.soft_reboot = lambda self: self.RebootGuest()
 vim.VirtualMachine.hard_reboot = lambda self: self.ResetVM().wait()
+vim.VirtualMachine.clone = clone
